@@ -16,11 +16,11 @@
             <h1>Todo List</h1>
           </div>
         </div>
-        <form class="row" action="{% url 'tasks' %}" method="POST">
+        <form class="row" action="{% url 'addTask' %}" method="POST">
           {% csrf_token %}
           <div class="col-auto">
               <button type="submit" class="btn btn-outline-success">
-                  <img src="{% static './images/icons/add.svg' %}" alt="Add Task">
+                  <img src="{% static './images/icons/add.svg' %}" alt="addTask">
               </button>
           </div>
           <div class="col">
@@ -45,7 +45,7 @@
               <th scope="row">{{ forloop.counter }}</th>
               <td>{{ task.description }}</td>
               <td><button type="button" class="btn btn-outline-primary"><img src="{% static './images/icons/pencil.svg' %}"/></button></td>
-              <td><button type="button" class="btn btn-outline-danger"><img src="{% static './images/icons/trash.svg' %}"/></button></td>
+              <td><button type="button" class="btn btn-outline-danger" action="{% url 'deleteTask' %}"><img src="{% static './images/icons/trash.svg' %}"/></button></td>
               <td><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></td>
             </tr>
             {% endfor %}
