@@ -2,55 +2,88 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static '/css/style.css' %}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static '/css/style.css' %}" />
     <title>Tasks</title>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container body">
-        <div class="row justify-content-md-center">
-          <div class="col col-md-auto">
-            <h1>Todo List</h1>
-          </div>
+      <div class="row justify-content-md-center">
+        <div class="col col-md-auto">
+          <h1>Todo List</h1>
         </div>
-        <form class="row" action="{% url 'addTask' %}" method="POST">
-          {% csrf_token %}
-          <div class="col-auto">
-              <button type="submit" class="btn btn-outline-success">
-                  <img src="{% static './images/icons/add.svg' %}" alt="addTask">
-              </button>
-          </div>
-          <div class="col">
-              {{ form.description }}
-          </div>
+      </div>
+      <form class="row" action="{% url 'addTask' %}" method="POST">
+        {% csrf_token %}
+        <div class="col-auto">
+          <button type="submit" class="btn btn-outline-success"><img src="{% static './images/icons/add.svg' %}" alt="addTask" /></button>
+        </div>
+        <div class="col">{{ form.description }}</div>
       </form>
-      
-      
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Description</th>
-              <th scope="col">Edit</th>
-              <th scope="col">Delete</th>
-              <th scope="col">Complete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for task in tasks %}
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Description</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Delete</th>
+            <th scope="col">Complete</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in tasks %}
             <tr>
               <th scope="row">{{ forloop.counter }}</th>
               <td>{{ task.description }}</td>
-              <td><button type="button" class="btn btn-outline-primary"><img src="{% static './images/icons/pencil.svg' %}"/></button></td>
-              <td><button type="button" class="btn btn-outline-danger" action="{% url 'deleteTask' %}"><img src="{% static './images/icons/trash.svg' %}"/></button></td>
-              <td><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"></td>
+              <td>
+                <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#updateTaskModal{{ task.pk }}"><img src="{% static './images/icons/pencil.svg' %}" /></button>
+              </td>
+              <td>
+                <a type="button" class="btn btn-outline-danger" href="{% url 'deleteTask' task.pk %}"><img src="{% static './images/icons/trash.svg' %}" /></a>
+              </td>
+              <td>
+                <a href="{% url 'updateStatusTask' task.pk %}">
+                  {% if task.completed %}
+                    <img src="{% static './images/icons/toggle_on.svg' %}" />
+                  {% else %}
+                    <img src="{% static './images/icons/toggle_off.svg' %}" />
+                  {% endif %}
+                </a>
+              </td>
             </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-</body>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
 </html>
+
+{% for task in tasks %}
+  <div class="modal fade" id="updateTaskModal{{ task.pk }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Change the Task</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url 'updateTask' task.pk %}" method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <div class="col" value="{{ task.description }}">{{ update_form.description }}</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Discard</button>
+              <button type="submit" class="btn btn-success">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
